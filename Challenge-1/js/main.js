@@ -72,11 +72,12 @@ function update(data) {
     xAxisGroup.transition(t).call(xAxis);
 
     var yAxis = d3.axisLeft(y)
+        .ticks(5)
         .tickSizeOuter(0);
     yAxisGroup.transition(t).call(yAxis);
 
     //JOIN NEW DATA WITH OLD
-    var rects = graph.selectAll('circle')
+    var rects = graph.selectAll('rect')
         .data(data, function (d) {
             return d.month;
         });
@@ -85,25 +86,45 @@ function update(data) {
     rects.exit()
         .attr('fill', 'red')
         .transition(t)
-        .attr('cy', y(0))
+        .attr('y', y(0))
+        .attr('height', 0)
         .remove();
+
+    // //UPDATE OLD ELEMENTS IN NEW DATA
+    // rects
+    //     .transition(t)
+    //     .attr('x', function (d) {
+    //         return x(d.month);
+    //     })
+    //     .attr('y', function (d) {
+    //         return y(d[value]);
+    //     })
+    //     .attr('width', x.bandwidth())
+    //     .attr('height', function (d) {
+    //         return height - y(d[value]);
+    //     });
 
     //ENTER NEW ELEMENTS PRESENT IN NEW DATA
     rects
         .enter()
-        .append('circle')
+        .append('rect')
         .attr('fill', '#CCC')
-        .attr('cx', function (d) {
-            return x(d.month) + (x.bandwidth() / 2);
+        .attr('x', function (d) {
+            return x(d.month);
         })
-        .attr('cy', y(0))
-        .attr('r', 5)
+        .attr('y', y(0))
+        .attr('height', 0)
+        .attr('width', x.bandwidth())
         .merge(rects)
         .transition(t)
-        .attr('cx', function (d) {
-            return x(d.month) + (x.bandwidth() / 2);
+        .attr('x', function (d) {
+            return x(d.month);
         })
-        .attr('cy', function (d) {
+        .attr('width', x.bandwidth())
+        .attr('y', function (d) {
             return y(d[value]);
+        })
+        .attr('height', function (d) {
+            return height - y(d[value]);
         })
 }
